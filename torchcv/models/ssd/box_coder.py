@@ -55,8 +55,9 @@ class SSDBoxCoder:
           https://github.com/chainer/chainercv/blob/master/chainercv/links/model/ssd/multibox_coder.py
         '''
         def argmax(x):
+            '''Find the max value index(row & col) of a 2D tensor.'''
             v, i = x.max(0)
-            j = v.max(0)[1][0]
+            j = v.max(0)[1].item()
             return (i[j], j)
 
         default_boxes = self.default_boxes  # xywh
@@ -74,8 +75,10 @@ class SSDBoxCoder:
             masked_ious[:,j] = 0
 
         mask = (index<0) & (ious.max(1)[0]>=0.5)
+        #if mask.any():
+        #    index[mask] = ious[mask.nonzero().squeeze()].max(1)[1]
         if mask.any():
-            index[mask] = ious[mask.nonzero().squeeze()].max(1)[1]
+            index[mask] = ious[mask].max(1)[1]
 
         boxes = boxes[index.clamp(min=0)]  # negative index not supported
         boxes = change_box_order(boxes, 'xyxy2xywh')
@@ -89,7 +92,8 @@ class SSDBoxCoder:
         cls_targets[index<0] = 0
         return loc_targets, cls_targets
 
-    def decode(self, loc_preds, cls_preds, score_thresh=0.6, nms_thresh=0.45):
+    def decode(self, loc_preds, cls_preds, score_thresh=0.35, nms_thresh=0.45):
+        print("decode called")
         '''Decode predicted loc/cls back to real box locations and class labels.
 
         Args:

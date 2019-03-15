@@ -109,11 +109,12 @@ def box_nms(bboxes, scores, threshold=0.5):
 
     keep = []
     while order.numel() > 0:
-        i = order[0]
-        keep.append(i)
-
         if order.numel() == 1:
             break
+        #print(order.numel())
+        i = order[0].item()
+        keep.append(i)
+
 
         xx1 = x1[order[1:]].clamp(min=x1[i].item())
         yy1 = y1[order[1:]].clamp(min=y1[i].item())

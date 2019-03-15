@@ -41,9 +41,9 @@ class ListDataset(data.Dataset):
         with open(list_file) as f:
             lines = f.readlines()
             self.num_imgs = len(lines)
-
         for line in lines:
-            splited = line.strip().split()
+            splited = line.strip().split(' ')
+            #print(splited)
             self.fnames.append(splited[0])
             num_boxes = (len(splited) - 1) // 5
             box = []
