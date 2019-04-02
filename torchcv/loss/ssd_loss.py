@@ -54,8 +54,12 @@ class SSDLoss(nn.Module):
         #===============================================================
         # cls_loss = CrossEntropyLoss(cls_preds, cls_targets)
         #===============================================================
+
+        #print(cls_preds.shape,cls_targets.shape)
+
         cls_loss = F.cross_entropy(cls_preds.view(-1,self.num_classes), \
                                    cls_targets.view(-1), reduce=False)  # [N*#anchors,]
+        #print(cls_loss,cls_targets)
         cls_loss = cls_loss.view(batch_size, -1)
         cls_loss[cls_targets<0] = 0  # set ignored loss to 0
         neg = self._hard_negative_mining(cls_loss, pos)  # [N,#anchors]

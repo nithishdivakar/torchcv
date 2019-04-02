@@ -92,7 +92,7 @@ class SSDBoxCoder:
         cls_targets[index<0] = 0
         return loc_targets, cls_targets
 
-    def decode(self, loc_preds, cls_preds, score_thresh=0.35, nms_thresh=0.45):
+    def decode(self, loc_preds, cls_preds, score_thresh=0.2, nms_thresh=0.45):
         print("decode called")
         '''Decode predicted loc/cls back to real box locations and class labels.
 
@@ -120,9 +120,14 @@ class SSDBoxCoder:
             mask = score > score_thresh
             if not mask.any():
                 continue
-            box = box_preds[mask.nonzero().squeeze()]
-            score = score[mask]
+            idxs = mask.nonzero().squeeze()
+            if len(idxs.shape)==0:
+                box = box_preds[None,idxs,:]
+            else:
+                box = box_preds[idxs,:]
 
+            score = score[mask]
+            
             keep = box_nms(box, score, nms_thresh)
             boxes.append(box[keep])
             labels.append(torch.LongTensor(len(box[keep])).fill_(i))
